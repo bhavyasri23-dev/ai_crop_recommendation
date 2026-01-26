@@ -1,0 +1,257 @@
+<parameter name="content">"""
+Unified Crop Recommendation and Disease Detection API
+All endpoints accessible via localhost:5002
+"""
+
+import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
+
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+from PIL import Image
+import io
+import base64
+import statistics
+
+from crop_recommendation_module.core.deterministic_mapper import DeterministicCropMapper
+from crop_recommendation_module.core.soil_validator import SoilValidator
+
+backend_path = os.path.join(os.path.dirname(__file__), 'backend')
+sys.path.insert(0, backend_path)
+
+try:
+    from iot_integration import get_iot_sensor_data
+except ImportError:
+    from backend.iot_integration import get_iot_sensor_data
+
+# Disease detection
+PLANT_CLASSES = ['corn', 'rice', 'wheat', 'tomato', 'cucumber', 'potato', 'soybean', 'apple']
+DISEASE_CLASSES = {
+    'corn': ['healthy', 'Common_rust', 'Northern_Leaf_Blight', 'Cercospora_leaf_spot'],
+    'rice': ['healthy', 'Brown_spot', 'Leaf_smut', 'Bacterial_blight'],
+    'wheat': ['healthy', 'Powdery_mildew', 'Leaf_rust', 'Septoria'],
+    'tomato': ['healthy', 'Early_blight', 'Late_blight', 'Leaf_Mold', 'Septoria_leaf_spot'],
+    'cucumber': ['healthy', 'Powdery_mildew', 'Downy_mildew', 'Bacterial_wilt', 'Angular_leaf_spot'],
+    'potato': ['healthy', 'Early_blight', 'Late_blight'],
+    'soybean': ['healthy', 'Bacterial_blight', 'Brown_spot'],
+    'apple': ['healthy', 'Apple_scab', 'Black_rot', 'Cedar_apple_rust']
+}
+
+def rgb_to_hsv(r, g, b):
+    r, g, b = r/255, g/255, b/255
+    max_c, min_c = max(r, g, b), min(r, g, b)
+    diff = max_c - min_c
+    if diff == 0:
+        h = 0
+    elif max_c == r:
+        h = (60 * ((g - b) / diff) + 360) % 360
+    elif max_c == g:
+        h = (60 * ((b - r) / diff) + 120) % 360
+    else:
+        h = (60 * ((r - g) / diff) + 240) % 360
+    s = 0 if max_c == 0 else (diff / max_c) * 100
+    v = max_c * 100
+    return h, s, v
+
+def analyze_image(image):
+    pixels = list(image.getdata())
+    hsv = [rgb_to_hsv(p[0], p[1], p[2]) for p in pixels]
+    return {
+        'avg_hue': statistics.mean([h for h, s, v in hsv]),
+        'avg_saturation': statistics.mean([s for h, s, v in hsv]),
+        'avg_value': statistics.mean([v for h, s, v in hsv]),
+    }
+
+def identify_plant(image):
+    c = analyze_image(image)
+    h, s, v = c['avg_hue'], c['avg_saturation'], c['avg_value']
+    if v > 65:
+        return 'wheat', 0.7
+    elif h < 15 and s > 50:
+        return 'apple', 0.8
+    elif h < 30 and s > 40:
+        return 'tomato', 0.75
+    elif 30 < h < 90:
+        return ('corn', 0.7) if image.size[0] / image.size[1] > 1.5 else ('cucumber', 0.7)
+    else:
+        return ('potato', 0.6) if v < 40 else ('soybean', 0.6)
+
+def detect_disease(image, plant):
+    c = analyze_image(image)
+    if c['avg_saturation'] < 25 and c['avg_value'] < 70:
+        d = DISEASE_CLASSES.get(plant, ['healthy'])
+        return d[1] if len(d) > 1 else 'healthy', 0.7
+    return 'healthy', 0.85
+
+def decode_image(data):
+    if isinstance(data, str):
+        if ',' in data:
+            data = data.split(',')[1]
+        data = base64.b64decode(data)
+    return Image.open(io.BytesIO(data)).convert('RGB')
+
+# District normalization
+DISTRICT_ALIASES = {
+    "anantapur": "Anantapur", "ananthapur": "Anantapur", "ananthapuramu": "Anantapur",
+    "kadapa": "Kadapa", "cuddapah": "Kadapa", "ysr kadapa": "Kadapa",
+    "nellore": "Nellore", "spsr nellore": "Nellore",
+    "chittoor": "Chittoor", "chittor": "Chittoor",
+    "vijayawada": "Krishna", "bezawada": "Krishna", "krishna": "Krishna",
+    "visakhapatnam": "Visakhapatnam", "vizag": "Visakhapatnam",
+    "east godavari": "East Godavari", "eastgodavari": "East Godavari",
+    "west godavari": "West Godavari", "westgodavari": "West Godavari",
+    "guntur": "Guntur", "gunthur": "Guntur",
+    "prakasam": "Prakasam", "prakasham": "Prakasam", "ongole": "Prakasam",
+    "kurnool": "Kurnool", "kurnul": "Kurnool",
+    "srikakulam": "Srikakulam",
+    "vizianagaram": "Vizianagaram", "vizianagram": "Vizianagaram"
+}
+
+def normalize_district(d):
+    if not d:
+        return ""
+    d = d.lower().strip()
+    return DISTRICT_ALIASES.get(d, d)
+
+# App setup
+app = Flask(__name__, static_folder='shared_frontend')
+CORS(app)
+mapper = DeterministicCropMapper()
+soil_validator = SoilValidator()
+
+# Crop endpoints
+@app.route('/api/recommend_crop', methods=['POST'])
+def recommend_crop():
+    try:
+        data = request.get_json() or {}
+        d = normalize_district(data.get('district', ''))
+        if not d:
+            return jsonify({'error': 'District is required'}), 400
+        
+        sensor_data = None
+        if data.get('sensor_id'):
+            try:
+                sr = get_iot_sensor_data(data['sensor_id'])
+                sensor_data = {k: sr['latest_reading'][k] for k in ['ph', 'nitrogen', 'phosphorus', 'rainfall']}
+            except:
+                return jsonify({'error': 'Failed to fetch sensor data'}), 400
+        
+        if not sensor_data:
+            sensor_data = data.get('sensor_data')
+        
+        if not sensor_data:
+            ph = data.get('pH', data.get('ph'))
+            n = data.get('nitrogen', data.get('N'))
+            p = data.get('phosphorus', data.get('P'))
+            r = data.get('rainfall')
+            if any(v is None for v in [ph, n, p, r]):
+                return jsonify({'error': 'Missing parameters: pH, nitrogen, phosphorus, rainfall'}), 400
+            sensor_data = {'pH': ph, 'nitrogen': n, 'phosphorus': p, 'rainfall': r}
+        
+        valid, err, vd = soil_validator.cross_validate_sources(sensor_data, data.get('satellite_data'), None)
+        if not valid:
+            return jsonify({'error': err}), 400
+        
+        result = mapper.recommend_crop(vd, d)
+        if 'error' in result:
+            return jsonify(result), 400
+        
+        fp = soil_validator.create_soil_fingerprint(vd['pH'], vd['nitrogen'], vd['phosphorus'], vd['rainfall'])
+        return jsonify({'data': [{
+            'recommendation': result['recommendation']['primary_crop'],
+            'accuracy': f"{int(result['recommendation']['confidence'] * 100)}%",
+            'soil_fingerprint': fp,
+            'district': d,
+            **vd
+        }]})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get_districts', methods=['GET'])
+def get_districts():
+    return jsonify({'districts': mapper.get_available_districts()})
+
+@app.route('/api/validate_soil_data', methods=['POST'])
+def validate_soil():
+    try:
+        data = request.get_json() or {}
+        valid, err, vd = soil_validator.cross_validate_sources(data.get('manual_data', {}), None, None)
+        if valid:
+            vd['soil_fingerprint'] = soil_validator.create_soil_fingerprint(vd['pH'], vd['nitrogen'], vd['phosphorus'], vd['rainfall'])
+        return jsonify({'is_valid': valid, 'error_message': err, 'validated_data': vd if valid else None})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get_crop_characteristics', methods=['GET'])
+def get_chars():
+    c = request.args.get('crop')
+    return jsonify({c: mapper.get_crop_characteristics(c)} if c else mapper.get_all_crops())
+
+# Disease endpoints
+@app.route('/api/detect_disease', methods=['POST'])
+def detect_disease_endpoint():
+    try:
+        img = None
+        jd = None
+        if 'image' in request.files:
+            img = request.files['image'].read()
+        elif request.is_json:
+            jd = request.get_json()
+            if jd and 'image' in jd:
+                b = jd['image']
+                img = base64.b64decode(b.split(',')[1] if ',' in b else b)
+        
+        if not img:
+            return jsonify({'error': 'No image provided'}), 400
+        
+        crop = None
+        if jd:
+            crop = jd.get('crop_type')
+        if 'crop_type' in request.form:
+            crop = request.form['crop_type']
+        
+        image = decode_image(img)
+        if not image:
+            return jsonify({'error': 'Could not decode image'}), 400
+        
+        if crop and crop.lower() in PLANT_CLASSES:
+            plant, conf = crop.lower(), 0.95
+        else:
+            plant, conf = identify_plant(image)
+        
+        disease, dconf = detect_disease(image, plant)
+        return jsonify({'data': {
+            'prediction': disease.replace('_', ' ').title(),
+            'confidence': min(conf, dconf),
+            'crop_type': plant.capitalize(),
+            'model_used': 'Color-based pattern detection',
+            'suggestions': {'immediate_actions': ['Consult local expert'], 'preventive_measures': ['Crop rotation', 'Disease-free seeds']}
+        }})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get_supported_crops', methods=['GET'])
+def supported_crops():
+    return jsonify({'supported_crops': list(DISEASE_CLASSES.keys()), 'crop_diseases': {k: [d.replace('_', ' ').title() for d in v] for k, v in DISEASE_CLASSES.items()}})
+
+# Static files
+@app.route('/', defaults={'path': 'index.html'})
+@app.route('/<path:path>')
+def serve(path):
+    try:
+        return send_from_directory(app.static_folder, path)
+    except:
+        if not path.startswith('api/'):
+            return send_from_directory(app.static_folder, 'index.html')
+        return jsonify({'error': 'Not found'}), 404
+
+if __name__ == '__main__':
+    print("=" * 50)
+    print("Unified API - localhost:5002")
+    print("=" * 50)
+    print("CROP: POST /api/recommend_crop, GET /api/get_districts, POST /api/validate_soil_data")
+    print("DISEASE: POST /api/detect_disease, GET /api/get_supported_crops")
+    print("=" * 50)
+    app.run(debug=True, host='0.0.0.0', port=5002, use_reloader=False)
+</parameter>

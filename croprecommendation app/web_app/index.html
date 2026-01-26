@@ -1,0 +1,278 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Crop Recommendation System for Farmers</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>🌾 AI Crop Recommendation System for Farmers</h1>
+        <p>Advanced AI-Powered Decision Support for Sustainable Agriculture</p>
+        <div class="header-features">
+            <span>🤖 AI-Driven Insights</span>
+            <span>🌍 Real-time Soil Analysis</span>
+            <span>📊 Profit & Yield Forecasting</span>
+            <span>🌱 Sustainability Scoring</span>
+        </div>
+    </header>
+
+    <nav>
+        <button class="nav-btn active" data-section="crop" onclick="showSection('crop')">Crop Recommendation</button>
+        <button class="nav-btn" data-section="disease" onclick="showSection('disease')">Disease Detection</button>
+        <button class="nav-btn" data-section="weather" onclick="showSection('weather')">Weather & Market</button>
+        <button class="nav-btn" data-section="insights" onclick="showSection('insights')">AI Insights</button>
+    </nav>
+
+    <main>
+        <!-- Crop Prediction Section -->
+        <section id="crop-prediction" class="active-section">
+            <h2>🤖 AI Crop Recommendation Engine</h2>
+            <p>Our advanced machine learning algorithms analyze soil properties, weather data, and market trends to provide hyper-localized crop recommendations with yield forecasting and profit margins.</p>
+
+            <div class="input-methods">
+                <button class="method-btn active" data-method="manual" onclick="setInputMethod('manual')">Manual Input</button>
+                <button class="method-btn" data-method="satellite" onclick="setInputMethod('satellite')">Satellite Data</button>
+                <button class="method-btn" data-method="iot" onclick="setInputMethod('iot')">IoT Sensors</button>
+            </div>
+
+            <form id="crop-form">
+                <div id="manual-inputs" class="input-section active">
+                    <h3>Soil & Environmental Parameters</h3>
+
+                    <!-- Manual Input Fields -->
+                    <div class="manual-fields-section">
+                        <h4>📝 Enter Soil Parameters</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ph">Soil pH:</label>
+                                <input type="number" id="ph" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="moisture">Moisture/Humidity (%):</label>
+                                <input type="number" id="moisture" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="n">Nitrogen (N) kg/ha:</label>
+                                <input type="number" id="n" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="p">Phosphorus (P) kg/ha:</label>
+                                <input type="number" id="p" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="k">Potassium (K) kg/ha:</label>
+                                <input type="number" id="k" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="temp">Temperature (°C):</label>
+                                <input type="number" id="temp" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="rainfall">Rainfall (mm/year):</label>
+                                <input type="number" id="rainfall" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="location">Location/District:</label>
+                                <input type="text" id="location" required placeholder="e.g., Ananthpur, Andhra Pradesh">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="satellite-inputs" class="input-section">
+                    <h3>Satellite Data Integration</h3>
+                    <p>Automatically fetch soil data from satellite APIs (Soil Grids, Bhuvan)</p>
+                    <div class="form-group">
+                        <label for="sat-location">Location Coordinates:</label>
+                        <input type="text" id="sat-location" placeholder="Latitude, Longitude">
+                    </div>
+                    <button type="button" onclick="fetchSatelliteData()">Fetch Satellite Data</button>
+                </div>
+
+                <div id="iot-inputs" class="input-section">
+                    <h3>IoT Sensor Integration</h3>
+                    <p>Connect to your IoT soil sensors for real-time data collection</p>
+                    <div class="form-group">
+                        <label for="sensor-id">Sensor ID:</label>
+                        <input type="text" id="sensor-id" placeholder="Enter sensor identifier">
+                    </div>
+                    <div class="iot-buttons">
+                        <button type="button" onclick="connectIoT()">🔗 Connect IoT Sensor</button>
+                        <button type="button" onclick="populateFromIoTSensor()">📊 Load Sensor Data</button>
+                        <button type="button" onclick="checkConnectedSensors()">📡 Check Connected Sensors</button>
+                    </div>
+                    <small>💡 Connect a sensor first, then load its real-time data into the form</small>
+                </div>
+
+                <button type="submit" class="predict-btn">🔮 Get AI Recommendation</button>
+            </form>
+            <div id="crop-result" class="result"></div>
+            <div id="crop-export-buttons" class="export-buttons" style="display: none;">
+                <button onclick="exportCropPDF()" class="export-btn pdf-btn">📄 Export PDF Report</button>
+                <button onclick="exportCropCSV()" class="export-btn csv-btn">📊 Export CSV Data</button>
+            </div>
+        </section>
+
+        <!-- Disease Prediction Section -->
+        <section id="disease-prediction">
+            <h2>🔍 AI Disease Detection & Diagnosis</h2>
+            <p>Upload plant images and our computer vision AI will identify diseases, pests, and nutrient deficiencies with high accuracy, providing treatment recommendations.</p>
+            <form id="disease-form">
+                <div class="form-group">
+                    <label for="image">Upload Plant Image:</label>
+                    <input type="file" id="image" accept="image/*" required>
+                    <small>Supported formats: JPG, PNG, JPEG (Max 5MB)</small>
+                </div>
+                <div class="form-group">
+                    <label for="crop-type">Crop Type (Optional):</label>
+                    <select id="crop-type">
+                        <option value="">Select crop type</option>
+                        <option value="rice">Rice</option>
+                        <option value="wheat">Wheat</option>
+                        <option value="maize">Maize</option>
+                        <option value="cotton">Cotton</option>
+                        <option value="sugarcane">Sugarcane</option>
+                        <option value="soybean">Soybean</option>
+                        <option value="barley">Barley</option>
+                        <option value="potato">Potato</option>
+                        <option value="tomato">Tomato</option>
+                        <option value="onion">Onion</option>
+                        <option value="groundnut">Groundnut</option>
+                        <option value="mustard">Mustard</option>
+                        <option value="sunflower">Sunflower</option>
+                    </select>
+                </div>
+                <button type="submit" class="predict-btn">🔬 Analyze Disease</button>
+            </form>
+            <div id="disease-result" class="result"></div>
+            <div id="disease-export-buttons" class="export-buttons" style="display: none;">
+                <button onclick="exportDiseasePDF()" class="export-btn pdf-btn">📄 Export PDF Report</button>
+            </div>
+        </section>
+
+        <!-- Weather & Market Section -->
+        <section id="weather">
+            <h2>🌤️ Weather & Market Intelligence</h2>
+            <p>Get localized weather forecasts and real-time market prices to make informed farming decisions.</p>
+
+            <div class="weather-market-tabs">
+                <button class="tab-btn active" onclick="showTab('weather')">Weather Forecast</button>
+                <button class="tab-btn" onclick="showTab('market')">Market Prices</button>
+            </div>
+
+            <div id="weather-tab" class="tab-content active">
+                <form id="weather-form">
+                    <div class="form-group">
+                        <label for="weather-location">Location:</label>
+                        <input type="text" id="weather-location" required>
+                    </div>
+                    <button type="submit" class="predict-btn">📊 Get Weather Data</button>
+                </form>
+                <div id="weather-result" class="result"></div>
+            </div>
+
+            <div id="market-tab" class="tab-content">
+                <form id="market-form">
+                    <div class="form-group">
+                        <label for="commodity">Commodity:</label>
+                        <select id="commodity">
+                            <option value="rice">Rice</option>
+                            <option value="wheat">Wheat</option>
+                            <option value="maize">Maize</option>
+                            <option value="cotton">Cotton</option>
+                            <option value="sugarcane">Sugarcane</option>
+                            <option value="soybean">Soybean</option>
+                            <option value="barley">Barley</option>
+                            <option value="potato">Potato</option>
+                            <option value="tomato">Tomato</option>
+                            <option value="onion">Onion</option>
+                            <option value="groundnut">Groundnut</option>
+                            <option value="mustard">Mustard</option>
+                            <option value="sunflower">Sunflower</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="market-location">Market Location:</label>
+                        <input type="text" id="market-location" required>
+                    </div>
+                    <button type="submit" class="predict-btn">💰 Get Market Prices</button>
+                </form>
+                <div id="market-result" class="result"></div>
+            </div>
+        </section>
+
+        <!-- AI Insights Section -->
+        <section id="insights">
+            <h2>🧠 AI Agricultural Insights</h2>
+            <p>Get personalized farming advice, sustainability scores, and predictive analytics for your farm.</p>
+
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <h3>🌱 Sustainability Score</h3>
+                    <p>Assess your farming practices' environmental impact</p>
+                    <button onclick="getSustainabilityScore()">Calculate Score</button>
+                    <div id="sustainability-result" class="mini-result"></div>
+                </div>
+
+                <div class="insight-card">
+                    <h3>💰 Profit Forecasting</h3>
+                    <p>Predict potential profits based on current conditions</p>
+                    <button onclick="getProfitForecast()">Get Forecast</button>
+                    <div id="profit-result" class="mini-result"></div>
+                </div>
+
+                <div class="insight-card">
+                    <h3>🔄 Crop Rotation Advice</h3>
+                    <p>AI recommendations for optimal crop rotation</p>
+                    <button onclick="getRotationAdvice()">Get Advice</button>
+                    <div id="rotation-result" class="mini-result"></div>
+                </div>
+
+                <div class="insight-card">
+                    <h3>📈 Yield Prediction</h3>
+                    <p>Advanced yield forecasting with ML models</p>
+                    <button onclick="getYieldPrediction()">Predict Yield</button>
+                    <div id="yield-result" class="mini-result"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>AI Crop Recommendation System</h3>
+                <p>Empowering farmers with AI-driven agricultural solutions for sustainable and profitable farming.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Features</h3>
+                <ul>
+                    <li>🤖 AI Crop Recommendations</li>
+                    <li>🔍 Disease Detection</li>
+                    <li>🌤️ Weather Intelligence</li>
+                    <li>💰 Market Insights</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Technology</h3>
+                <ul>
+                    <li>Machine Learning</li>
+                    <li>Computer Vision</li>
+                    <li>IoT Integration</li>
+                    <li>Satellite Data</li>
+                </ul>
+            </div>
+        </div>
+        <p>&copy; 2024 AI Crop Recommendation System. Powered by Advanced Machine Learning & Computer Vision.</p>
+    </footer>
+
+    <script src="script.js?v=1.3"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+{
+  "deterministic_mapping": {
+    "soil_condition_fingerprints": {
+      "acidic_low_nutrient_low_rainfall": "Groundnut",
+      "acidic_low_nutrient_medium_rainfall": "Cotton",
+      "acidic_low_nutrient_high_rainfall": "Rice",
+      "acidic_medium_nutrient_low_rainfall": "Sunflower",
+      "acidic_medium_nutrient_medium_rainfall": "Cotton",
+      "acidic_medium_nutrient_high_rainfall": "Rice",
+      "acidic_high_nutrient_low_rainfall": "Groundnut",
+      "acidic_high_nutrient_medium_rainfall": "Cotton",
+      "acidic_high_nutrient_high_rainfall": "Sugarcane",
+      "neutral_low_nutrient_low_rainfall": "Groundnut",
+      "neutral_low_nutrient_medium_rainfall": "Cotton",
+      "neutral_low_nutrient_high_rainfall": "Rice",
+      "neutral_medium_nutrient_low_rainfall": "Sunflower",
+      "neutral_medium_nutrient_medium_rainfall": "Cotton",
+      "neutral_medium_nutrient_high_rainfall": "Rice",
+      "neutral_high_nutrient_low_rainfall": "Groundnut",
+      "neutral_high_nutrient_medium_rainfall": "Cotton",
+      "neutral_high_nutrient_high_rainfall": "Sugarcane",
+      "alkaline_low_nutrient_low_rainfall": "Groundnut",
+      "alkaline_low_nutrient_medium_rainfall": "Cotton",
+      "alkaline_low_nutrient_high_rainfall": "Rice",
+      "alkaline_medium_nutrient_low_rainfall": "Sunflower",
+      "alkaline_medium_nutrient_medium_rainfall": "Cotton",
+      "alkaline_medium_nutrient_high_rainfall": "Rice",
+      "alkaline_high_nutrient_low_rainfall": "Groundnut",
+      "alkaline_high_nutrient_medium_rainfall": "Cotton",
+      "alkaline_high_nutrient_high_rainfall": "Sugarcane"
+    },
+    "district_overrides": {
+      "Srikakulam": {
+        "neutral_high_high": "Rice",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Rice",
+        "neutral_medium_medium": "Rice",
+        "neutral_low_medium": "Groundnut",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Vizianagaram": {
+        "neutral_high_high": "Rice",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Rice",
+        "neutral_medium_medium": "Rice",
+        "neutral_low_medium": "Groundnut",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Visakhapatnam": {
+        "neutral_high_high": "Rice",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Rice",
+        "neutral_medium_medium": "Rice",
+        "neutral_low_medium": "Groundnut",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "East Godavari": {
+        "neutral_high_high": "Sugarcane",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Cotton",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut",
+        "alkaline_high_high": "Sugarcane",
+        "alkaline_medium_high": "Cotton",
+        "alkaline_low_high": "Cotton",
+        "alkaline_high_medium": "Cotton",
+        "alkaline_medium_medium": "Cotton",
+        "alkaline_low_medium": "Cotton",
+        "alkaline_high_low": "Cotton",
+        "alkaline_medium_low": "Groundnut",
+        "alkaline_low_low": "Groundnut"
+      },
+      "West Godavari": {
+        "neutral_high_high": "Rice",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Cotton",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Krishna": {
+        "neutral_high_high": "Cotton",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Cotton",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Guntur": {
+        "neutral_high_high": "Sugarcane",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Prakasam": {
+        "neutral_high_high": "Sugarcane",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Nellore": {
+        "neutral_high_high": "Sugarcane",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Chittoor": {
+        "neutral_high_high": "Groundnut",
+        "neutral_medium_high": "Cotton",
+        "neutral_low_high": "Cotton",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Anantapur": {
+        "neutral_high_high": "Groundnut",
+        "neutral_medium_high": "Cotton",
+        "neutral_low_high": "Cotton",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Kurnool": {
+        "neutral_high_high": "Groundnut",
+        "neutral_medium_high": "Cotton",
+        "neutral_low_high": "Cotton",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Kadapa": {
+        "neutral_high_high": "Groundnut",
+        "neutral_medium_high": "Cotton",
+        "neutral_low_high": "Cotton",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Groundnut",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      },
+      "Vijayawada": {
+        "neutral_high_high": "Cotton",
+        "neutral_medium_high": "Rice",
+        "neutral_low_high": "Rice",
+        "neutral_high_medium": "Cotton",
+        "neutral_medium_medium": "Cotton",
+        "neutral_low_medium": "Cotton",
+        "neutral_high_low": "Cotton",
+        "neutral_medium_low": "Groundnut",
+        "neutral_low_low": "Groundnut"
+      }
+    },
+    "soil_categories": {
+      "ph_ranges": {
+        "acidic": [4.0, 6.0],
+        "neutral": [6.0, 7.5],
+        "alkaline": [7.5, 9.0]
+      },
+      "nutrient_ranges": {
+        "low": [0, 40],
+        "medium": [40, 100],
+        "high": [100, 200]
+      },
+      "rainfall_ranges": {
+        "low": [0, 500],
+        "medium": [500, 800],
+        "high": [800, 1000]
+      }
+    }
+  },
+  "crop_characteristics": {
+    "Rice": {
+      "optimal_ph": [5.5, 7.0],
+      "optimal_nitrogen": [80, 120],
+      "optimal_phosphorus": [40, 60],
+      "optimal_rainfall": [800, 1000],
+      "regions": ["Coastal Andhra"],
+      "description": "High water requirement crop suitable for delta regions"
+    },
+    "Cotton": {
+      "optimal_ph": [6.0, 8.0],
+      "optimal_nitrogen": [60, 100],
+      "optimal_phosphorus": [20, 40],
+      "optimal_rainfall": [500, 800],
+      "regions": ["South Coastal Andhra", "Rayalaseema"],
+      "description": "Drought tolerant crop suitable for varied soil conditions"
+    },
+    "Groundnut": {
+      "optimal_ph": [6.0, 7.5],
+      "optimal_nitrogen": [20, 40],
+      "optimal_phosphorus": [30, 50],
+      "optimal_rainfall": [500, 700],
+      "regions": ["Rayalaseema", "South Coastal Andhra"],
+      "description": "Oilseed crop suitable for dry regions with moderate rainfall"
+    },
+    "Sugarcane": {
+      "optimal_ph": [6.5, 7.5],
+      "optimal_nitrogen": [150, 200],
+      "optimal_phosphorus": [50, 80],
+      "optimal_rainfall": [800, 1000],
+      "regions": ["Coastal Andhra"],
+      "description": "High nutrient and water requirement crop for fertile regions"
+    },
+    "Sunflower": {
+      "optimal_ph": [6.0, 8.0],
+      "optimal_nitrogen": [50, 80],
+      "optimal_phosphorus": [40, 60],
+      "optimal_rainfall": [400, 600],
+      "regions": ["Rayalaseema"],
+      "description": "Oilseed crop tolerant to poor soil conditions"
+    }
+  }
+}

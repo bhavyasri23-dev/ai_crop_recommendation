@@ -1,0 +1,10 @@
+{
+  "status": "success",
+  "prediction": {
+    "crop_type": "Corn",
+    "crop_confidence": 0.987,
+    "disease": "Common_rust",
+    "disease_confidence": 0.892
+  },
+  "message": "Detected Common_rust on Corn with 89.2% confidence"
+}

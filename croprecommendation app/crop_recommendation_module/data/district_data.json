@@ -1,0 +1,15 @@
+{
+  "Anantapur": {"primary_crop": "Groundnut", "secondary_crop": "Millets"},
+  "Chittoor": {"primary_crop": "Sugarcane", "secondary_crop": "Groundnut"},
+  "East Godavari": {"primary_crop": "Rice", "secondary_crop": "Sugarcane"},
+  "West Godavari": {"primary_crop": "Rice", "secondary_crop": "Maize"},
+  "Krishna": {"primary_crop": "Rice", "secondary_crop": "Maize"},
+  "Guntur": {"primary_crop": "Chilli", "secondary_crop": "Cotton"},
+  "Prakasam": {"primary_crop": "Groundnut", "secondary_crop": "Tobacco"},
+  "Nellore": {"primary_crop": "Rice", "secondary_crop": "Groundnut"},
+  "Kadapa": {"primary_crop": "Groundnut", "secondary_crop": "Pulses"},
+  "Kurnool": {"primary_crop": "Cotton", "secondary_crop": "Sunflower"},
+  "Srikakulam": {"primary_crop": "Cashew", "secondary_crop": "Rice"},
+  "Vizianagaram": {"primary_crop": "Cashew", "secondary_crop": "Pulses"},
+  "Visakhapatnam": {"primary_crop": "Coconut", "secondary_crop": "Groundnut"}
+}
