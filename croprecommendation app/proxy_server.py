@@ -19,18 +19,19 @@ app = Flask(__name__)
 CORS(app)
 
 # Module URLs
-CROP_MODULE_URL = "http://localhost:5001"
-DISEASE_MODULE_URL = "http://localhost:5002"
+# Crop module runs on 5002, disease module runs on 5003
+CROP_MODULE_URL = "http://localhost:5002"
+DISEASE_MODULE_URL = "http://localhost:5003"
 
 def start_crop_module():
-    """Start crop recommendation module on port 5001"""
-    print("🌾 Starting Crop Recommendation Module on port 5001...")
+    """Start crop recommendation module on port 5002"""
+    print("🌾 Starting Crop Recommendation Module on port 5002...")
     crop_dir = os.path.join(os.path.dirname(__file__), 'crop_recommendation_module')
     subprocess.run([sys.executable, 'app.py'], cwd=crop_dir)
 
 def start_disease_module():
-    """Start disease detection module on port 5002"""
-    print("🔬 Starting Disease Detection Module on port 5002...")
+    """Start disease detection module on port 5003"""
+    print("🔬 Starting Disease Detection Module on port 5003...")
     time.sleep(2)  # Delay to let crop module start first
     disease_dir = os.path.join(os.path.dirname(__file__), 'disease_detection_module')
     subprocess.run([sys.executable, 'app.py'], cwd=disease_dir)
@@ -86,12 +87,13 @@ def proxy_disease_prediction():
         if 'crop_type' in request.form:
             data['crop_type'] = request.form['crop_type']
 
-        # Try /api/detect_disease first, fallback to /api/predict_disease
-        try:
-            response = requests.post(f"{DISEASE_MODULE_URL}/api/detect_disease", files=files, data=data, timeout=30)
-        except:
-            response = requests.post(f"{DISEASE_MODULE_URL}/api/predict_disease", files=files, data=data, timeout=30)
-        
+        # Forward to the supported disease endpoint
+        response = requests.post(
+            f"{DISEASE_MODULE_URL}/api/detect_disease",
+            files=files,
+            data=data,
+            timeout=30
+        )
         return jsonify(response.json()), response.status_code
     except requests.exceptions.RequestException as e:
         return jsonify({'error': f'Disease module unavailable: {str(e)}'}), 503
@@ -230,8 +232,8 @@ if __name__ == '__main__':
     print("🚀 Starting AI Crop Recommendation System Proxy")
     print("===============================================")
     print("🌐 Proxy Server: http://localhost:5000")
-    print("🌾 Crop Module: http://localhost:5001")
-    print("🔬 Disease Module: http://localhost:5002")
+    print("🌾 Crop Module: http://localhost:5002")
+    print("🔬 Disease Module: http://localhost:5003")
     print("Press Ctrl+C to stop all modules")
     print("===============================================")
 

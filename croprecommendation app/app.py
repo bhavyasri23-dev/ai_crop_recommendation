@@ -5,6 +5,8 @@ import io
 
 # Import from your packages
 from crop_recommendation_module.core.deterministic_mapper import DeterministicCropMapper
+from crop_recommendation_module.core.soil_validator import SoilValidator
+from crop_recommendation import CropRecommender
 from disease_detection_module.core.single_output_detector import disease_detector
 from disease_detection_module.core.image_processor import image_processor
 from disease_detection_module.core.disease_suggestions import disease_suggestions
@@ -15,8 +17,24 @@ def create_app():
     CORS(app)
 
     mapper = DeterministicCropMapper()
+    soil_validator = SoilValidator()
+    recommender = CropRecommender()
 
-    @app.route("/", methods=["GET"])
+    def calibrate_accuracy(score):
+        """
+        Map suitability score (0-100) to a conservative accuracy percentage (40-95).
+        """
+        try:
+            score = float(score)
+        except (TypeError, ValueError):
+            return 0
+
+        score = max(0.0, min(100.0, score))
+        accuracy = 40.0 + (score * 0.55)
+        accuracy = max(40.0, min(95.0, accuracy))
+        return int(round(accuracy))
+
+    @app.route("/status", methods=["GET"])
     def home():
         return jsonify({
             "status": "ok",
@@ -27,7 +45,8 @@ def create_app():
     def recommend_crop():
         data = request.get_json(force=True, silent=True) or {}
 
-        district = data.get("district", "")
+        district_raw = data.get("district", "")
+        district = mapper._normalize_district(district_raw)
 
         def safe(val, default):
             try:
@@ -35,21 +54,57 @@ def create_app():
             except (TypeError, ValueError):
                 return default
 
-        soil_data = {
-            "pH": safe(data.get("pH"), 7.0),
-            "nitrogen": safe(data.get("nitrogen"), 50.0),
-            "phosphorus": safe(data.get("phosphorus"), 30.0),
-            "rainfall": safe(data.get("rainfall"), 900.0),
-        }
+        # Accept both short and full field names
+        soil_ph = safe(data.get("pH", data.get("ph")), 7.0)
+        nitrogen = safe(data.get("nitrogen", data.get("N")), 50.0)
+        phosphorus = safe(data.get("phosphorus", data.get("P")), 30.0)
+        potassium = safe(data.get("potassium", data.get("K")), 40.0)
+        moisture = safe(data.get("moisture", data.get("humidity")), 50.0)
+        temperature = safe(data.get("temperature", data.get("temp")), 28.0)
+        rainfall = safe(data.get("rainfall"), 900.0)
 
-        result = mapper.recommend_crop(soil_data, district)
+        validation_error = soil_validator.validate_manual_inputs(
+            soil_ph, nitrogen, phosphorus, rainfall
+        )
+        if validation_error:
+            return jsonify({"error": validation_error}), 400
+
+        # Use the richer scoring recommender and return TOP-1 deterministically
+        recommender.rainfall_mm = rainfall
+        result = recommender.recommend_crops(
+            soil_ph,
+            moisture,
+            nitrogen,
+            phosphorus,
+            potassium,
+            temperature,
+            district,
+            top_n=1
+        )
+
+        if not result.get("recommendations"):
+            return jsonify({"error": "No suitable crop found"}), 400
+
+        top = result["recommendations"][0]
+        soil_fingerprint = soil_validator.create_soil_fingerprint(
+            soil_ph, nitrogen, phosphorus, rainfall
+        )
 
         return jsonify({
-            "input": {
+            "data": [{
+                "recommendation": top["crop"],
+                "accuracy": f"{calibrate_accuracy(top['suitability_score'])}%",
+                "reason": top.get("reason", ""),
+                "soil_fingerprint": soil_fingerprint,
                 "district": district,
-                "soil_data": soil_data
-            },
-            "recommendation": result
+                "nitrogen": nitrogen,
+                "phosphorus": phosphorus,
+                "potassium": potassium,
+                "pH": soil_ph,
+                "moisture": moisture,
+                "temperature": temperature,
+                "rainfall": rainfall
+            }]
         }), 200
 
     @app.route('/api/detect_disease', methods=['POST'])
@@ -200,7 +255,7 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    print("🌾 AI Crop Recommendation & Disease Detection System")
-    print("🌐 Server running on http://127.0.0.1:5002")
-    print("📊 Supported crops for disease detection:", disease_detector.get_supported_crops())
+    print("AI Crop Recommendation & Disease Detection System")
+    print("Server running on http://127.0.0.1:5002")
+    print("Supported crops for disease detection:", disease_detector.get_supported_crops())
     app.run(host="127.0.0.1", port=5002, debug=False)

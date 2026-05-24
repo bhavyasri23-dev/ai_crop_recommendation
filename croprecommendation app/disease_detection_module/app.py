@@ -17,6 +17,14 @@ from core.model_manager import model_manager
 app = Flask(__name__, static_folder='../shared_frontend')
 CORS(app)  # Enable CORS for all routes
 
+# ---- Temporary request logging (to debug 405/404 issues) ----
+@app.before_request
+def log_incoming_request():
+    try:
+        print(f"[disease-module] Incoming request: {request.method} {request.path} (Content-Type: {request.content_type})")
+    except Exception:
+        pass
+
 # -------------------
 # TensorFlow cleanup
 # -------------------

@@ -5,7 +5,7 @@ Provides consistent crop recommendations based on soil conditions from any data 
 
 from typing import Dict, List, Tuple, Optional
 from district_agro_data import get_crop_requirements, get_all_crops, get_district_zone
-from soil_conditions import soil_manager
+from backend.soil_conditions import soil_manager
 
 class SoilConditionAnalyzer:
     """

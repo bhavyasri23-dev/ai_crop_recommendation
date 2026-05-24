@@ -1,3 +1,4 @@
+
 """
 Rule-Based Weighted Scoring Crop Recommendation System
 Recommends crops based on soil conditions, nutrients, temperature, and district agro-zones
@@ -6,7 +7,7 @@ Recommends crops based on soil conditions, nutrients, temperature, and district 
 import math
 from district_agro_data import get_district_zone, get_crop_requirements, get_all_crops
 from soil_improvement import get_complete_soil_improvement_plan
-from soil_condition_analyzer import soil_analyzer
+from backend.soil_condition_analyzer import soil_analyzer
 from backend.satellite_integration import get_satellite_soil_data, get_satellite_weather_data
 from backend.iot_integration import get_iot_sensor_data
 

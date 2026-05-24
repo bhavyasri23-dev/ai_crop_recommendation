@@ -11,17 +11,19 @@ import os
 import time
 import threading
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 def run_crop_module():
     """Run the crop recommendation module on port 5002"""
     print("🚀 Starting Crop Recommendation Module on port 5002...")
-    os.chdir('crop_recommendation_module')
+    os.chdir(os.path.join(BASE_DIR, 'crop_recommendation_module'))
     subprocess.run([sys.executable, 'app.py'])
 
 def run_disease_module():
     """Run the disease detection module on port 5001"""
     print("🔬 Starting Disease Detection Module on port 5001...")
     time.sleep(2)  # Small delay to let crop module start first
-    os.chdir('disease_detection_module')
+    os.chdir(os.path.join(BASE_DIR, 'disease_detection_module'))
     subprocess.run([sys.executable, 'app.py'])
 
 if __name__ == '__main__':
